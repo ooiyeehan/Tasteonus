@@ -1,0 +1,167 @@
+import React, {useContext, useState} from 'react';
+import {View, Text, TouchableOpacity, Platform, StyleSheet, Alert} from 'react-native';
+import * as Facebook from 'expo-facebook'
+import Toast from 'react-native-toast-message';
+
+import { AuthContext, loadedUsers } from '../navigation/AuthProvider';
+import FormInput from '../components/FormInput';
+import FormButton from '../components/FormButton';
+import SocialButton from '../components/SocialButton';
+
+
+const SignupScreen = ({navigation}) => {
+  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const {register, FacebookLogIn} = useContext(AuthContext);
+
+  const handleRegister = (email, username, password, confirmPassword) => {
+    if(email == "" || username == "" || password == "" || confirmPassword == ""){
+      Toast.show({
+        type:'error',
+        text1:'Please insert all the details!'
+      })
+      return;
+    }
+    else if ( password != confirmPassword ) {
+        Toast.show({
+          type:'error',
+          text1:'Passwords do not match!'
+      })
+        return;
+    }
+    else{
+      register(navigation, username, email, password);
+    }
+    
+  }
+  return (
+    <View style={styles.container}>
+      <Text style={styles.text}>Create an account</Text>
+
+      <FormInput
+        labelValue={email}
+        onChangeText={(userEmail) => setEmail(userEmail)}
+        placeholderText="Email"
+        iconType="user"
+        keyboardType="email-address"
+        autoCapitalize="none"
+        autoCorrect={false}
+      />
+
+      <FormInput
+        labelValue={username}
+        onChangeText={(username) => setUsername(username)}
+        placeholderText="Username"
+        iconType="user"
+        keyboardType="default"
+        autoCapitalize="none"
+        autoCorrect={false}
+      />
+
+      <FormInput
+        labelValue={password}
+        onChangeText={(userPassword) => setPassword(userPassword)}
+        placeholderText="Password"
+        iconType="lock"
+        secureTextEntry={true}
+      />
+
+      <FormInput
+        labelValue={confirmPassword}
+        onChangeText={(userPassword) => setConfirmPassword(userPassword)}
+        placeholderText="Confirm Password"
+        iconType="lock"
+        secureTextEntry={true}
+      />
+
+      <FormButton
+        buttonTitle="Sign Up"
+        onPress={() => handleRegister(email, username, password, confirmPassword)
+        }
+      />
+
+      {/* <View style={styles.textPrivate}>
+        <Text style={styles.color_textPrivate}>
+          By registering, you confirm that you accept our{' '}
+        </Text>
+        <TouchableOpacity onPress={() => alert('Terms Clicked!')}>
+          <Text style={[styles.color_textPrivate, {color: '#e88832'}]}>
+            Terms of service
+          </Text>
+        </TouchableOpacity>
+        <Text style={styles.color_textPrivate}> and </Text>
+        <TouchableOpacity onPress={() => alert('Terms Clicked!')}>
+          <Text style={[styles.color_textPrivate, {color: '#e88832'}]}>
+            Privacy Policy
+          </Text>
+        </TouchableOpacity>
+      </View> */}
+        <Text style={styles.orText}>OR</Text>
+
+        <View>
+          <SocialButton
+            buttonTitle="Sign Up with Facebook"
+            btnType="facebook"
+            color="#4867aa"
+            backgroundColor="#e6eaf4"
+            onPress={() => {FacebookLogIn(navigation)}}
+          />
+        </View>
+
+
+      <TouchableOpacity
+        style={styles.navButton}
+        onPress={() => navigation.navigate('LogIn')}>
+        <Text style={styles.navButtonText}>Have an account? Sign In</Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
+
+export default SignupScreen;
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: '#f9fafd',
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  text: {
+    fontFamily: 'Kufam-SemiBoldItalic',
+    fontSize: 28,
+    marginBottom: 10,
+    color: '#051d5f',
+  },
+  orText:{
+    fontFamily: 'Kufam-SemiBoldItalic',
+    fontSize: 14,
+    marginTop: 10,
+    marginBottom: 10,
+    color: '#051d5f',
+  },
+  navButton: {
+    marginTop: 15,
+  },
+  navButtonText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#2e64e5',
+    fontFamily: 'Lato-Regular',
+  },
+  textPrivate: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginVertical: 35,
+    justifyContent: 'center',
+  },
+  color_textPrivate: {
+    fontSize: 13,
+    fontWeight: '400',
+    fontFamily: 'Lato-Regular',
+    color: 'grey',
+  },
+});
